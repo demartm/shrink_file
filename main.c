@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -99,6 +100,28 @@ if(a && b){
 return false;
 }
 
+
+bool compare(FILE *a, FILE *b){
+
+if(a && b){
+  unsigned char buf_a = 0;
+  unsigned char buf_b = 0;
+
+  bool is_end =false;
+
+  while(fread(&buf_a,1,1,a) && fread(&buf_b,1,1,b)){
+
+    if(buf_a != buf_b){
+
+      return false;
+    }
+
+  }
+  return true;
+}
+return false;
+
+}
 
 int main()
 {
