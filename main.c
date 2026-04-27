@@ -2,37 +2,60 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-int main()
-{
-FILE *a, *b;
-
-a = fopen("/home/root_user/shrink_file/test.txt","r");
-b = fopen("/home/root_user/shrink_file/test2.txt","w+");
+void shrink_file(FILE *a,FILE *b){
 
 char *buff = (char*)calloc(1000,sizeof(char));
 
 if(a){
 
-  for(int i = 0; fread(buff,1,7,a) > 0; i += 7){
+  size_t read = 0;
 
-    unsigned char mask = 1;
+  while((read = fread(buff,1,7,a)) == 7){
 
-    for(int j = 1; j < 7; j++ ){
+      unsigned char mask = 1;
 
-      if(buff[0] & mask){
+      for(int j = 1; j < 7; j++ ){
 
-        buff[j] = buff[j] | 128;//10000000b
+        if(buff[0] & mask){
+
+          buff[j] = buff[j] | 128;//10000000b
+        }
+
+        mask = mask << 1;
       }
 
-      mask = mask << 1;
+      fwrite(&buff[1],1,6,b);
+
     }
 
-    fwrite(&buff[1],1,6,b);
+  if(read > 0){
 
+    fwrite(buff,1,read,b);
   }
 
 
 }
+}
 
+int main()
+{
+FILE *a, *b;
+
+a = fopen("/home/root_user/shrink_file/test.txt","r");
+
+if(a){
+
+b = fopen("/home/root_user/shrink_file/test2.txt","wb+");
+
+if(b){
+
+shrink_file(a,b);
+
+}
+
+}
+
+fclose(a);
+fclose(b);
 return 0;
 }
