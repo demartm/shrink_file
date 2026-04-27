@@ -1,18 +1,27 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 int main()
 {
-FILE *a;
-a = fopen("/home/root_user/shrink_file/main.c","r");
-char *buff = (char*)calloc(100,sizeof(char));
-if(a){
 
-while(fread(buff,1,1,a) > 0){
-printf("1");
-}
+FILE *a, *b;
+a= fopen("test.txt","rb");
+b= fopen("test3.txt","rb");
 
+unsigned char buf_a = 0;
+unsigned char buf_b = 0;
+
+bool is_end =false;
+
+while(fread(&buf_a,1,1,a) && fread(&buf_b,1,1,b) && !is_end){
+  if(buf_a != buf_b){
+    printf("error");
+    is_end = true;
+  }
 }
- //   printf("Hello World!\n");
+fclose(a);
+fclose(b);
+
     return 0;
 }
