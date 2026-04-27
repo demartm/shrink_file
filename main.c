@@ -125,40 +125,137 @@ return false;
 
 int main()
 {
-FILE *a, *b;
 
-a = fopen("test.txt","r");
+FILE *a = NULL;
+FILE *b = NULL;
 
-if(a){
+a = fopen("test.txt","rb");
+if(!a){
+  printf("unable to open file");
 
-b = fopen("test2.txt","wb+");
-
-if(b){
-
-if(!pack_file(a,b)){
-printf("error1");
+  return 0;
 }
 
+b = fopen("test2.txt","wb");
+if(!b){
+  printf("unable to open file");
+
+  fclose(a);
+
+  return 0;
+}
+
+if(!pack_file(a,b)){
+  printf("error packing file");
+
+  fclose(a);
+  fclose(b);
+
+  return 0;
+}
 fclose(a);
 fclose(b);
 
-FILE *c = fopen("test2.txt","rb");
-FILE *d = fopen("test3.txt","wb+");
 
-if(c && d){
+FILE *c = NULL;
+FILE *d = NULL;
+
+c = fopen("test2.txt","rb");
+
+if(!c){
+  printf("unable to open file");
+
+  return 0;
+}
+
+d = fopen("test3.txt","wb+");
+
+if(!d){
+  printf("unable to open file");
+
+  fclose(c);
+
+  return 0;
+}
+
+
 if(!unpack_file(c,d)){
+  printf("error unpacking file");
 
-printf("error2");
+  fclose(c);
+  fclose(d);
+
+  return 0;
 }
 
-}
-fclose(c);
-fclose(d);
+  fclose(c);
+  fclose(d);
 
+FILE *e = NULL;
+FILE *f = NULL;
+
+e = fopen("test2.txt","rb");
+
+if(!e){
+  printf("unable to open file");
+
+  return 0;
 }
 
+f = fopen("test3.txt","rb");
+
+if(!f){
+  printf("unable to open file");
+
+  fclose(e);
+
+  return 0;
 }
 
+if(!compare(e,f)){
+printf("incorrect unpacking");
+  fclose(e);
+  fclose(f);
+return 0;
+}
+
+
+// FILE *a, *b;
+
+// a = fopen("test.txt","r");
+
+// if(a){
+
+// b = fopen("test2.txt","wb+");
+
+// if(b){
+
+// if(!pack_file(a,b)){
+// printf("error1");
+// }
+
+// fclose(a);
+// fclose(b);
+
+// FILE *c = fopen("test2.txt","rb");
+// FILE *d = fopen("test3.txt","wb+");
+
+// if(c && d){
+// if(!unpack_file(c,d)){
+
+// printf("error2");
+// }
+
+// }
+// fclose(c);
+// fclose(d);
+
+// }
+
+// }
+
+  fclose(e);
+  fclose(f);
 
 return 0;
 }
