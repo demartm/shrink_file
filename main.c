@@ -2,22 +2,27 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-void pack_file(FILE *a,FILE *b){
+bool pack_file(FILE *a,FILE *b){
 
 if(a && b){
 
-  unsigned char *buff = (unsigned char*)calloc(7,sizeof(unsigned char));
+  unsigned char *buff = (unsigned char*)calloc(8,sizeof(unsigned char));
 
     if(buff){
       size_t read = 0;
 
-      while((read = fread(buff,1,7,a)) == 7){
+      while((read = fread(buff,1,8,a)) == 8){
 
           unsigned char mask = 1;
 
-          for(int j = 1; j < 7; j++ ){
+          for(int j = 1; j < 8; j++){
 
             if(buff[0] & mask){
+
+              if(buff[j] & 128){
+
+                return false;
+              }
 
               buff[j] = buff[j] | 128;//10000000b
             }
@@ -25,36 +30,42 @@ if(a && b){
             mask = mask << 1;
           }
 
-          fwrite(&buff[1],1,6,b);
+          if(!fwrite(&buff[1],1,7,b)){
+
+            return false;
+            }
 
         }
 
       if(read > 0){
 
-        fwrite(buff,1,read,b);
+        if(!fwrite(buff,1,read,b)){
+
+          return false;
+        }
       }
 
-
+    return true;
     }
 }
-
+return false;
 }
 
-void unpack_file(FILE *a, FILE *b){
+bool unpack_file(FILE *a, FILE *b){
 
 if(a && b){
 
-  unsigned char *buff = (unsigned char*)calloc(7,sizeof(unsigned char));
+  unsigned char *buff = (unsigned char*)calloc(8,sizeof(unsigned char));
 
   if(buff){
 
     size_t read = 0;
 
-    while((read = fread(&buff[1],1,6,a)) == 6){
+    while((read = fread(&buff[1],1,7,a)) == 7){
       buff[0] = 0;
       unsigned char mask = 128;
 
-      for(int i = 1; i < 7; i++){
+      for(int i = 1; i < 8; i++){
 
         buff[0] = buff[0] | (buff[i] & mask);
         buff[0] = buff[0] >> 1;
@@ -63,23 +74,29 @@ if(a && b){
 
       }
 
-      buff[0] = buff[0] >> 1;
+      //buff[0] = buff[0] >> 1;
 
-      fwrite(buff,1,7,b);
+      if(!fwrite(buff,1,8,b)){
+        return false;
+      }
 
     }
 
     if(read > 0){
-      fwrite(buff,1,read,b);
+
+      if(!fwrite(&buff[1],1,read,b)){
+
+        return false;
+      }
     }
 
-
+  return true;
   }
 
 
 }
 
-
+return false;
 }
 
 
@@ -87,28 +104,33 @@ int main()
 {
 FILE *a, *b;
 
-a = fopen("/home/root_user/shrink_file/test.txt","r");
+a = fopen("test.txt","r");
 
 if(a){
 
-b = fopen("/home/root_user/shrink_file/test2.txt","wb+");
+b = fopen("test2.txt","wb+");
 
 if(b){
 
-pack_file(a,b);
+if(!pack_file(a,b)){
+printf("error1");
+}
 
 fclose(a);
 fclose(b);
 
-FILE *c = fopen("/home/root_user/shrink_file/test2.txt","rb");
-FILE *d = fopen("/home/root_user/shrink_file/test3.txt","wb+");
+FILE *c = fopen("test2.txt","rb");
+FILE *d = fopen("test3.txt","wb+");
 
 if(c && d){
-unpack_file(c,d);
+if(!unpack_file(c,d)){
+
+printf("error2");
+}
 
 }
-fclose(a);
-fclose(b);
+fclose(c);
+fclose(d);
 
 }
 
