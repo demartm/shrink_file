@@ -12,19 +12,12 @@ if(a && b){
     if(buff){
       size_t read = 0;
 
-      //while((read = fread(buff,1,8,a)) == 8){
-bool isEnd = false;
+      while ((read = fscanf(a,"%c",buff)) == 1){
 
-while((read = fscanf(a,"%c",buff)) > 0 && !isEnd) {
-  size_t read_last = 0;
-  while((read_last = fscanf(a,"%c",&buff[read])) > 0 && read < 8){
-
-    read += read_last;//fscanf(a,"%c",&buff[read - 1]);
-  }
-
-  if(read == 8){
-
-
+      for(int i = 1; i < 8 && fscanf(a,"%c",&buff[i]) == 1;i++){
+        read++;
+      }
+if(read == 8){//printf("%s",buff);
           unsigned char mask = 1;
 
           for(int j = 1; j < 8; j++){
@@ -32,7 +25,7 @@ while((read = fscanf(a,"%c",buff)) > 0 && !isEnd) {
             if(buff[0] & mask){
 
               if(buff[j] & 128){
-
+//printf("%s",buff);
                 return false;
               }
 
@@ -42,27 +35,36 @@ while((read = fscanf(a,"%c",buff)) > 0 && !isEnd) {
             mask = mask << 1;
           }
 
-          if(!fwrite(&buff[1],1,7,b)){
+          // if(!fwrite(&buff[1],1,7,b)){
+          // // if(!fprintf(b,"%7c",&buff[1])) {
+          // //   return false;
+          //    }
 
+        for(int i = 1;i<8;i++){
+
+          if(!fprintf(b,"%c",buff[i])) {
             return false;
-            }
-        *len += 7;
-} else {
-    isEnd = true;
-}
-
+          }else{
+            (*len)++;
+          }
+        }
+        //*len += 7;
+        }else{
       if(read > 0){
 
         if(!fwrite(buff,1,read,b)){
 
           return false;
+        }else{
+          *len++;
         }
       }
-
+}
+}
+free(buff);
     return true;
 
     }
-}
 }
 return false;
 }
@@ -77,45 +79,84 @@ if(a && b){
 
     size_t read = 0;
     size_t read_total = 0;
+    size_t remain = len % 8;
+    size_t len_8 = len - remain;//(len%8);
+    size_t ix = 0;
+while(ix < len){    buff[0] = 0;
+  for(int i = 1; i < 8; i++){
+if(fscanf(a,"%c",&buff[i]) == 1){
 
-    while((read = fread(&buff[1],1,7,a)) == 7 && read_total < len){
-//while((read = fscanf(a,"%c",buff)) > 0){
+    unsigned char mask = 128;//10000000b
+    buff[0] = buff[0] | (buff[i] & mask);
+    buff[0] = buff[0] >> 1;
+printf(" %d",buff[0]);
+    buff[i] = buff[i] & (~mask);
+    ix++;
+}else{
 
-//while()
-      buff[0] = 0;
-      unsigned char mask = 128;
-
-      for(int i = 1; i < 8; i++){
-
-        buff[0] = buff[0] | (buff[i] & mask);
-        buff[0] = buff[0] >> 1;
-
-        buff[i] = buff[i] & (~mask);
-
-      }
-
-
-      if(!fwrite(buff,1,8,b)){
-        return false;
-      }
-      read_total += 7;
-
-    }
-
-    if(read > 0){
-
-      if(!fwrite(&buff[1],1,read,b)){
-
-        return false;
-      }
-    }
-
-  return true;
+return false;
+}
   }
 
+  for(int i = 0; i < 8; i++){
+    if(!fprintf(b,"%c",buff[i])){
+      return 0;
+    }
+  }
+}
+while(fscanf(a,"%c",buff) == 1){
+    if(!fprintf(b,"%c",buff[0])){
+      return 0;
+    }
+}
+// for(int i = 0; i <remain; i++){
+//   if(fscanf(a,"%c",&buff[i]) != 1){
+// return false;
+// }
+//     if(!fprintf(b,"%c",buff[i])){
+//       return 0;
+//     }
+// }
+//return 1;
+//delay cherez absolutniy index ix!!!!!!!!!
+  //   while((read = fscanf(a,"%c",&buff[1])) == 1 && read_total < len){
 
+  //     buff[0] = 0;
+  //     unsigned char mask = 128;
+
+  //     for(int i = 1; i < 8; i++){
+
+  //       buff[0] = buff[0] | (buff[i] & mask);
+  //       buff[0] = buff[0] >> 1;
+
+  //       buff[i] = buff[i] & (~mask);
+
+  //     }
+
+
+  //     if(!fwrite(buff,1,8,b)){
+  //       return false;
+  //     }
+  //     read_total += 7;
+
+  //   }
+
+  //   if(read > 0){
+
+  //     if(!fwrite(&buff[1],1,read,b)){
+
+  //       return false;
+  //     }
+  //   }
+
+  // return true;
+  // }
+
+return true;
 }
 
+return false;
+}
 return false;
 }
 
@@ -152,7 +193,6 @@ if(!a){
 
   return 0;
 }
-
 b = fopen("test2.txt","wb");
 if(!b){
   printf("unable to open file");
@@ -170,7 +210,9 @@ if(!pack_file(a,b,&len)){
 
   return 0;
 } else{
-  printf("file packed successfully");
+
+printf("%d",len);
+  printf("\nfile packed successfully");
 }
 fclose(a);
 fclose(b);
@@ -199,7 +241,7 @@ if(!d){
 
 
 if(!unpack_file(c,d,len)){
-  printf("error unpacking file");
+  printf("\nerror unpacking file");
 
   fclose(c);
   fclose(d);
@@ -232,13 +274,13 @@ if(!f){
 }
 
 if(!compare(e,f)){
-  printf("incorrect unpacking");
+  printf("\nincorrect unpacking");
   fclose(e);
   fclose(f);
 return 0;
 } else {
 
-printf("successfully unpacked");
+printf("\nsuccessfully unpacked");
 
 }
 
