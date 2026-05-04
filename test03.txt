@@ -1,0 +1,11 @@
+
+                    if (buff[0] & 128) {
+                        ret_code = 3;
+                        is_ok = false;
+                    }
+                    else {
+                        for (int i = 1; i < 8 && fscanf(a, "%c", (unsigned char*)&buff[i]) == 1 && is_ok; i++) {
+                            if (buff[i] & 128) {
+                                ret_code = 3;
+                                is_ok = false;
+                                i = 8;
