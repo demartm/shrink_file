@@ -185,9 +185,25 @@ return false;
 }
 
 
-bool compare(FILE *a, FILE *b){
+bool compare(char *file_a,char *file_b){
+FILE *a  = fopen(file_a,"rb");//NULL;
+FILE *b = fopen(file_b,"rb");//NULL;
+//size_t len = 0;
 
-if(a && b){
+
+if(!a){
+  //printf("unable to open file");
+
+  return 0;
+}
+if(!b){
+  //printf("unable to open file");
+
+  fclose(a);
+
+  return 0;
+}
+//if(a && b){
   unsigned char buf_a = 0;
   unsigned char buf_b = 0;
   int n1 = 0;
@@ -203,9 +219,15 @@ if(a && b){
     if((n1 == 1) && (n2 == 1)){
 
       if(buf_a != buf_b){
+
+fclose(a);
+fclose(b);
         return false;
       }
     } else {
+
+fclose(a);
+fclose(b);
       return false;
     }
   } else{
@@ -214,9 +236,11 @@ if(a && b){
 
   }
 
+fclose(a);
+fclose(b);
   return true;
-}
-return false;
+//}
+//return false;
 
 }
 
@@ -313,7 +337,7 @@ if(!f){
   return 0;
 }
 
-if(!compare(e,f)){
+if(!compare("test.txt","test3.txt")){
   printf("\nincorrect unpacking");
   fclose(e);
   fclose(f);
