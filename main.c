@@ -13,21 +13,22 @@ if(a && b){
       size_t read = 0;
 
       while ((read = fscanf(a,"%c",buff)) == 1){
-
       for(int i = 1; i < 8 && fscanf(a,"%c",&buff[i]) == 1;i++){
+              if(buff[i] & 128){
+
+                return false;
+              }
         read++;
       }
-if(read == 8){//printf("%s",buff);
+
+      if(read == 8){//printf("%s",buff);
           unsigned char mask = 1;
 
           for(int j = 1; j < 8; j++){
 
             if(buff[0] & mask){
 
-              if(buff[j] & 128){
-//printf("%s",buff);
-                return false;
-              }
+
 
               buff[j] = buff[j] | 128;//10000000b
             }
@@ -35,36 +36,43 @@ if(read == 8){//printf("%s",buff);
             mask = mask << 1;
           }
 
-          // if(!fwrite(&buff[1],1,7,b)){
-          // // if(!fprintf(b,"%7c",&buff[1])) {
-          // //   return false;
-          //    }
 
-        for(int i = 1;i<8;i++){
+        for(int i = 1;i < 8;i++){
 
-          if(!fprintf(b,"%c",buff[i])) {
+          if(fprintf(b,"%c",buff[i]) != 1) {
             return false;
           }else{
             (*len)++;
           }
         }
-        //*len += 7;
+
         }else{
       if(read > 0){
 
-        if(!fwrite(buff,1,read,b)){
+        for(int i = 0; i < read; i++){
 
-          return false;
-        }else{
-          *len++;
-        }
+          if(fprintf(b,"%c",buff[i]) != 1){
+
+            return false;
+           }// else {
+
+          //   //(*len)++;
+          // }
+
+}
+        // if(!fwrite(buff,1,read,b)){
+
+        //   return false;
+        // }else{
+        //   (*len)++;
+        // }
       }
 }
 }
-free(buff);
-    return true;
+  free(buff);
+  return true;
 
-    }
+}
 }
 return false;
 }
@@ -77,85 +85,47 @@ if(a && b){
 
   if(buff){
 
-    size_t read = 0;
-    size_t read_total = 0;
-    size_t remain = len % 8;
-    size_t len_8 = len - remain;//(len%8);
     size_t ix = 0;
-while(ix < len){    buff[0] = 0;
+  unsigned char mask = 128;//10000000b
+
+  while(ix < len){
+
+  buff[0] = 0;
+
   for(int i = 1; i < 8; i++){
-if(fscanf(a,"%c",&buff[i]) == 1){
+    if(fscanf(a,"%c",&buff[i]) == 1){
 
-    unsigned char mask = 128;//10000000b
-    buff[0] = buff[0] | (buff[i] & mask);
-    buff[0] = buff[0] >> 1;
-printf(" %d",buff[0]);
-    buff[i] = buff[i] & (~mask);
-    ix++;
-}else{
+      buff[0] = buff[0] | (buff[i] & mask);
+      buff[0] = buff[0] >> 1;
+      //printf(" %d",buff[0]);
+      buff[i] = buff[i] & (~mask);
+      ix++;
+    } else {
 
-return false;
-}
+      return false;
+    }
   }
 
   for(int i = 0; i < 8; i++){
-    if(!fprintf(b,"%c",buff[i])){
+
+    if(fprintf(b,"%c",buff[i]) != 1){
+
       return 0;
     }
   }
 }
-while(fscanf(a,"%c",buff) == 1){
-    if(!fprintf(b,"%c",buff[0])){
-      return 0;
-    }
-}
-// for(int i = 0; i <remain; i++){
-//   if(fscanf(a,"%c",&buff[i]) != 1){
-// return false;
-// }
-//     if(!fprintf(b,"%c",buff[i])){
-//       return 0;
-//     }
-// }
-//return 1;
-//delay cherez absolutniy index ix!!!!!!!!!
-  //   while((read = fscanf(a,"%c",&buff[1])) == 1 && read_total < len){
+  while(fscanf(a,"%c",buff) == 1){
 
-  //     buff[0] = 0;
-  //     unsigned char mask = 128;
+      if(!fprintf(b,"%c",buff[0])){
 
-  //     for(int i = 1; i < 8; i++){
+        return 0;
+      }
+  }
 
-  //       buff[0] = buff[0] | (buff[i] & mask);
-  //       buff[0] = buff[0] >> 1;
-
-  //       buff[i] = buff[i] & (~mask);
-
-  //     }
-
-
-  //     if(!fwrite(buff,1,8,b)){
-  //       return false;
-  //     }
-  //     read_total += 7;
-
-  //   }
-
-  //   if(read > 0){
-
-  //     if(!fwrite(&buff[1],1,read,b)){
-
-  //       return false;
-  //     }
-  //   }
-
-  // return true;
-  // }
-
-return true;
+  free(buff);
+  return true;
 }
 
-return false;
 }
 return false;
 }
@@ -166,14 +136,30 @@ bool compare(FILE *a, FILE *b){
 if(a && b){
   unsigned char buf_a = 0;
   unsigned char buf_b = 0;
+  int n1 = 0;
+  int n2 = 0;
+  bool is_end = false;
+  while(!is_end){
 
-  while(fread(&buf_a,1,1,a) && fread(&buf_b,1,1,b)){
+  n1 = fscanf(a,"%c",&buf_a);
+  n2 = fscanf(b,"%c",&buf_b);
 
-    if(buf_a != buf_b){
+  if((n1 == 1) || (n2 == 1)){
+
+    if((n1 == 1) && (n2 == 1)){
+
+      if(buf_a != buf_b){
+        return false;
+      }
+    } else {
       return false;
     }
+  } else{
+    is_end = true;
+  }
 
   }
+
   return true;
 }
 return false;
