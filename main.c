@@ -3,9 +3,25 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-bool pack_file(FILE *a,FILE *b, size_t *len){
+bool pack_file(char *file_a,char *file_b, size_t *len){
+FILE *a  = fopen(file_a,"rb");//NULL;
+FILE *b = fopen(file_b,"wb");//NULL;
+//size_t len = 0;
 
-if(a && b){
+
+if(!a){
+  //printf("unable to open file");
+
+  return 0;
+}
+if(!b){
+  //printf("unable to open file");
+
+  fclose(a);
+
+  return 0;
+}
+//if(a && b){
 
   unsigned char *buff = (unsigned char*)calloc(8,sizeof(unsigned char));
 
@@ -13,9 +29,17 @@ if(a && b){
       size_t read = 0;
 
       while ((read = fscanf(a,"%c",buff)) == 1){
+
+              if(buff[0] & 128){
+  fclose(a);
+  fclose(b);
+                return false;
+              }
+
       for(int i = 1; i < 8 && fscanf(a,"%c",&buff[i]) == 1;i++){
               if(buff[i] & 128){
-
+  fclose(a);
+  fclose(b);
                 return false;
               }
         read++;
@@ -40,6 +64,8 @@ if(a && b){
         for(int i = 1;i < 8;i++){
 
           if(fprintf(b,"%c",buff[i]) != 1) {
+  fclose(a);
+  fclose(b);
             return false;
           }else{
             (*len)++;
@@ -69,16 +95,37 @@ if(a && b){
       }
 }
 }
+
+  fclose(a);
+  fclose(b);
   free(buff);
   return true;
 
 }
-}
+//}
+  fclose(a);
+  fclose(b);
 return false;
 }
 
-bool unpack_file(FILE *a, FILE *b, size_t len){
+bool unpack_file(char *file_a,char *file_b, size_t len){
+FILE *a  = fopen(file_a,"rb");//NULL;
+FILE *b = fopen(file_b,"wb");//NULL;
+//size_t len = 0;
 
+
+if(!a){
+  //printf("unable to open file");
+
+  return 0;
+}
+if(!b){
+  //printf("unable to open file");
+
+  fclose(a);
+
+  return 0;
+}
 if(a && b){
 
   unsigned char *buff = (unsigned char*)calloc(8,sizeof(unsigned char));
@@ -101,7 +148,8 @@ if(a && b){
       buff[i] = buff[i] & (~mask);
       ix++;
     } else {
-
+fclose(a);
+fclose(b);
       return false;
     }
   }
@@ -109,7 +157,8 @@ if(a && b){
   for(int i = 0; i < 8; i++){
 
     if(fprintf(b,"%c",buff[i]) != 1){
-
+fclose(a);
+fclose(b);
       return 0;
     }
   }
@@ -117,16 +166,21 @@ if(a && b){
   while(fscanf(a,"%c",buff) == 1){
 
       if(!fprintf(b,"%c",buff[0])){
-
+fclose(a);
+fclose(b);
         return 0;
       }
   }
 
   free(buff);
+fclose(a);
+fclose(b);
   return true;
 }
 
 }
+fclose(a);
+fclose(b);
 return false;
 }
 
@@ -173,26 +227,26 @@ FILE *a = NULL;
 FILE *b = NULL;
 size_t len = 0;
 
-a = fopen("test.txt","rb");
-if(!a){
-  printf("unable to open file");
+// a = fopen("test.txt","rb");
+// if(!a){
+//   printf("unable to open file");
 
-  return 0;
-}
-b = fopen("test2.txt","wb");
-if(!b){
-  printf("unable to open file");
+//   return 0;
+// }
+// b = fopen("test2.txt","wb");
+// if(!b){
+//   printf("unable to open file");
 
-  fclose(a);
+//   fclose(a);
 
-  return 0;
-}
+//   return 0;
+// }
 
-if(!pack_file(a,b,&len)){
+if(!pack_file("test.txt","test2.txt",&len)){
   printf("error packing file");
 
-  fclose(a);
-  fclose(b);
+  // fclose(a);
+  // fclose(b);
 
   return 0;
 } else{
@@ -200,43 +254,43 @@ if(!pack_file(a,b,&len)){
 printf("%d",len);
   printf("\nfile packed successfully");
 }
-fclose(a);
-fclose(b);
+// fclose(a);
+// fclose(b);
 
 
-FILE *c = NULL;
-FILE *d = NULL;
+// FILE *c = NULL;
+// FILE *d = NULL;
 
-c = fopen("test2.txt","rb");
+// c = fopen("test2.txt","rb");
 
-if(!c){
-  printf("unable to open file");
+// if(!c){
+//   printf("unable to open file");
 
-  return 0;
-}
+//   return 0;
+// }
 
-d = fopen("test3.txt","wb+");
+// d = fopen("test3.txt","wb+");
 
-if(!d){
-  printf("unable to open file");
+// if(!d){
+//   printf("unable to open file");
 
-  fclose(c);
+//   fclose(c);
 
-  return 0;
-}
+//   return 0;
+// }
 
 
-if(!unpack_file(c,d,len)){
+if(!unpack_file("test2.txt","test3.txt",len)){
   printf("\nerror unpacking file");
 
-  fclose(c);
-  fclose(d);
+  // fclose(c);
+  // fclose(d);
 
   return 0;
 }
 
-  fclose(c);
-  fclose(d);
+  // fclose(c);
+  // fclose(d);
 
 FILE *e = NULL;
 FILE *f = NULL;
