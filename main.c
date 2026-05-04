@@ -287,7 +287,6 @@ char test3[] = "test3.txt";
 // fclose(a);
 // return 0;
 
- // fclose(a);
 int code = 0;
 if((code = pack_file(test1,test2)) != 0){
 
