@@ -272,7 +272,7 @@ if(!b){
 
 int main()
 {
-char text[] = "helloworld12345\0";
+char text[] = "\0hellowo\0rld1234\0q234567";//"\0helloworld12345\0";
 char test1[] = "test01.txt";//"test02.txt";//"test03.txt";//"test04.txt";//"test05.txt";//"test06.txt";//"test07.txt";//"test08.txt";
 //char test1[] = "test.txt";
 char test2[] = "test2.txt";
