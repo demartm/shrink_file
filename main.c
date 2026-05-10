@@ -23,32 +23,30 @@ if(!b){
   fseek(a,0,SEEK_END);
   int size = ftell(a);
   fseek(a,0,SEEK_SET);
-  unsigned char tail = size%8;
+
+  size_t ix = 0;
+
+  unsigned char tail = size %  8;
   if(size != 0) {
+
   if(fprintf(b,"%c",tail) == 1) {
+
   unsigned char *buff = (unsigned char*)calloc(8,sizeof(unsigned char));
 
     if(buff){
       size_t read = 0;
 
-      while ((read = fscanf(a,"%c",buff)) == 1 && is_ok == 1){
+      while (is_ok == 1){
 
-          if(buff[0] & 128){
+      for(read = 0; read < 8 && fscanf(a,"%c",(unsigned char*)&buff[read]) == 1 && is_ok;read++){
+         if(buff[read] & 128){
             ret_code = 3;
             is_ok = false;
-          }else{
-      for(int i = 1; i < 8 && fscanf(a,"%c",(unsigned char*)&buff[i]) == 1 && is_ok;i++){
-         if(buff[i] & 128){
-            ret_code = 3;
-            is_ok = false;
-            i = 8;
 
-              }else{
-        read++;
+        }
       }
-}
-}
-if(is_ok){
+
+  if(is_ok){
       if(read == 8){
           unsigned char mask = 1;
 
@@ -74,6 +72,8 @@ if(is_ok){
         }
 
         }else{
+      is_ok = false;
+
       if(read > 0){
 
         for(int i = 0; i < read; i++){
@@ -86,10 +86,12 @@ if(is_ok){
            }
 
         }
+//is_ok = false;
 
       }
-      }
-}
+    }
+  }
+  ix += read;
 }
 
 free(buff);
@@ -99,14 +101,18 @@ free(buff);
 
 }
 } else {
-ret_code = 10;
+  ret_code = 10;
 }
 if(fclose(b) != 0){
 
   ret_code = 6;
 }
-if(ret_code){
-  remove(file_b);
+if(ret_code && ret_code !=6){
+  if(ix != size){
+    remove(file_b);
+  } else {
+    ret_code = 11;
+  }
 }
 
 if(fclose(a) != 0){
@@ -139,23 +145,28 @@ if(!b){
 fseek(a,0,SEEK_END);
 size_t len = ftell(a);
 fseek(a,0,SEEK_SET);
+
 unsigned char tail = 0;
+size_t ix = 0;
 if(len != 0) {
+
 if(fscanf(a,"%c",(unsigned char*)&tail) == 1){
-if(tail < 8){
-len = len - (int)tail - 1;
+
+if(tail < 8 && tail >= 0){
+
+  len = len - (int)tail - 1;
+
   unsigned char *buff = (unsigned char*)calloc(8,sizeof(unsigned char));
 
   if(buff){
 
-    size_t ix = 0;
-  unsigned char mask = 128;//10000000b
+    unsigned char mask = 128;//10000000b
 
   while(ix < len && is_ok == 1){
 
   buff[0] = 0;
 
-  for(int i = 1; i < 8 && is_ok; i++){
+  for(int i = 1; i < 8/* && is_ok*/; i++){
     if(fscanf(a,"%c",(unsigned char*)&buff[i]) == 1){
 
       buff[0] = buff[0] | (buff[i] & mask);
@@ -166,11 +177,12 @@ len = len - (int)tail - 1;
     } else {
       ret_code = 3;
       is_ok = false;
+      i = 8;
 
     }
   }
-
-  for(int i = 0; i < 8 && is_ok; i++){
+if(is_ok){
+  for(int i = 0; i < 8/* && is_ok*/; i++){
 
     if(fprintf(b,"%c",buff[i]) != 1){
       ret_code = 4;
@@ -178,6 +190,7 @@ len = len - (int)tail - 1;
 
     }
   }
+}
 }
   while(fscanf(a,"%c",buff) == 1 && is_ok){
 
@@ -195,6 +208,8 @@ ret_code = 5;
 }
 
 
+} else {
+ret_code = 9;
 }
 
 }
@@ -206,8 +221,12 @@ if(fclose(b) != 0){
 
   ret_code = 6;
 }
-if(ret_code){
-  remove(file_b);
+if(ret_code && ret_code != 6){
+  if(ix != len){
+    remove(file_b);
+  } else{
+    ret_code = 11;
+  }
 }
 if(fclose(a) != 0){
   ret_code = 6;
@@ -275,17 +294,12 @@ int main()
 char text[] = "\0hellowo\0rld1234\0q234567";//"\0helloworld12345\0";
 char test1[] = "test01.txt";//"test02.txt";//"test03.txt";//"test04.txt";//"test05.txt";//"test06.txt";//"test07.txt";//"test08.txt";
 //char test1[] = "test.txt";
-char test2[] = "test2.txt";
+char test2[] = "test2.txt";//"test2_10.txt";
 char test3[] = "test3.txt";
 //  FILE *a = fopen(test1,"r");
 // // fwrite(text,1,sizeof(text)-1,a);
-
-// fseek(a,0,SEEK_END);
-// len = ftell(a);
-// fseek(a,0,SEEK_END);
-// printf("%d",len);
 // fclose(a);
-// return 0;
+
 
 int code = 0;
 if((code = pack_file(test1,test2)) != 0){
