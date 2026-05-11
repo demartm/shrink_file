@@ -50,6 +50,9 @@ if(fprintf(b,"%c",tail) == 1){
 
     } else {
       i = 8;
+      if(ftell(a) == 0){
+        ret_code = -2;
+      }
     }
   }
 
@@ -224,6 +227,8 @@ free(buff);
 } else {
   ret_code = 8;
 }
+} else {
+  ret_code = -2;
 }
 
 
@@ -300,9 +305,9 @@ return false;
 int main()
 {
 char text[] = {"\0hello\x1Awo\0rld1234\0q234567"};//"\0helloworld12345\0";
-char test1[] = "test01.txt";//"test11.txt";//"test02.txt";//"test03.txt";//"test04.txt";//"test05.txt";//"test06.txt";//"test07.txt";//"test08.txt";
+char test1[] = "test01.txt";//"test12.txt";//"test11.txt";//"test02.txt";//"test03.txt";//"test04.txt";//"test05.txt";//"test06.txt";//"test07.txt";//"test08.txt";
 //char test1[] = "test.txt";
-char test2[] = "test2.txt";//"test2_10.txt";
+char test2[] = "test2.txt";//"test2_10.txt";//"test12.txt"
 char test3[] = "test3.txt";
 //  FILE *a = fopen(test1,"w");
 
