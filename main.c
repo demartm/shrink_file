@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+/*Тема  -  Реализация алгоритма сжатия текста.*/
+
 int pack_file(char *file_a,char *file_b){
 
 FILE *a  = fopen(file_a,"rb");
