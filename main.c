@@ -22,14 +22,14 @@ if(!b){
 
   return 1;
 }
-  fseek(a,0,SEEK_END);
-  int size = ftell(a);
-  fseek(a,0,SEEK_SET);
+  // fseek(a,0,SEEK_END);
+  // int size = ftell(a);
+  // fseek(a,0,SEEK_SET);
 
   size_t ix = 0;
 
-  unsigned char tail = size %  8;
-  if(size != 0) {
+  unsigned char tail = 0;// = size %  8;
+ // if(size != 0) {
 
   if(fprintf(b,"%c",tail) == 1) {
 
@@ -89,7 +89,8 @@ if(!b){
 
         }
 //is_ok = false;
-
+      fseek(b,0,SEEK_SET);
+      fprintf(b,"%c",(char)read);
       }
     }
   }
@@ -102,7 +103,8 @@ free(buff);
 }
 
 }
-} else {
+if(ix == 0) {
+//} else {
   ret_code = 10;
 }
 if(fclose(b) != 0){
@@ -110,13 +112,13 @@ if(fclose(b) != 0){
   ret_code = 6;
 }
 if(ret_code && ret_code !=6){
-  if(ix != size){
+//  if(ix != size){
     remove(file_b);
-  } else {
-    if(ret_code != 10) {
-      ret_code = 11;
-    }
-  }
+  //} else {
+    // if(ret_code != 10) {
+    //   ret_code = 11;
+    // }
+  //}
 }
 
 if(fclose(a) != 0){
@@ -298,7 +300,7 @@ if(!b){
 int main()
 {
 char text[] = {"\0hello\x1Awo\0rld1234\0q234567"};//"\0helloworld12345\0";
-char test1[] = "test11.txt";//"test02.txt";//"test03.txt";//"test04.txt";//"test05.txt";//"test06.txt";//"test07.txt";//"test08.txt";
+char test1[] = "test01.txt";//"test11.txt";//"test02.txt";//"test03.txt";//"test04.txt";//"test05.txt";//"test06.txt";//"test07.txt";//"test08.txt";
 //char test1[] = "test.txt";
 char test2[] = "test2.txt";//"test2_10.txt";
 char test3[] = "test3.txt";
