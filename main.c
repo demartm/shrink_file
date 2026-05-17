@@ -274,8 +274,8 @@ if(fclose(a) != 0){
 
   unsigned char buf_a = 0;
   unsigned char buf_b = 0;
-  int n1 = 0;
-  int n2 = 0;
+  int n1 = 1;
+  int n2 = 1;
 
   bool same = true;
 
