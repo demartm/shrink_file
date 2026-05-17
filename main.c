@@ -29,9 +29,10 @@ char read = 0;
 unsigned char tail = 0;
 if(fprintf(b,"%c",tail) == 1){
 
-  unsigned char *buff = (unsigned char*)calloc(8,sizeof(unsigned char));
+  //unsigned char *buff = (unsigned char*)calloc(8,sizeof(unsigned char));
+  unsigned char buff[8] = {0};
 
-  if(buff){
+  //if(buff){
 
   int status = 1;
 
@@ -100,10 +101,10 @@ if(ret_code == 0){
   }
 }
 
-free(buff);
-  } else {
-    ret_code = 7;
-  }
+//free(buff);
+  // } else {
+  //   ret_code = 7;
+  // }
 
 }else {
     ret_code = 8;
@@ -161,9 +162,10 @@ if(fscanf(a,"%c",(unsigned char*)&tail) == 1){
 
 if(tail < 8){
 
-  unsigned char *buff = (unsigned char*)calloc(8,sizeof(unsigned char));
+  //unsigned char *buff = (unsigned char*)calloc(8,sizeof(unsigned char));
+  unsigned char buff[8] = {0};
 
-  if(buff){
+  //if(buff){
 
   unsigned char mask = 128;//10000000b
   int status = 1;
@@ -220,10 +222,10 @@ if(read == tail && fscanf(a,"%c",&test) != 1){
     }
 }
 }
-free(buff);
-} else {
-  ret_code = 9;
-}
+//free(buff);
+// } else {
+//   ret_code = 9;
+// }
 } else {
   ret_code = 8;
 }
